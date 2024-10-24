@@ -1,4 +1,3 @@
-BIN_DIR=bin
 PROGRAM=mergesort-par
 
 CC=g++
