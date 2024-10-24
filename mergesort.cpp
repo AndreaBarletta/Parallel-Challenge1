@@ -56,8 +56,6 @@ bool isSorted(int ref[], int data[], const size_t size){
 /**
   * sequential merge step (straight-forward implementation)
   */
-// TODO: cut-off could also apply here (extra parameter?)
-// TODO: optional: we can also break merge in two halves
 void MsMergeSequential(int *out, int *in, long begin1, long end1, long begin2, long end2, long outBegin) {
 	long left = begin1;
 	long right = begin2;
@@ -121,10 +119,11 @@ void Ms(int *array, int *tmp, const size_t size) {
    // Creates parallel threads to execute the tasks, and let the master thread start the merge sort algorithm
    	#pragma omp parallel master
 	{
-		// At depth N (starting from 1), we have a total of 2^N-1 function calls. We will limit the number of tasks
-		// such that they can all be executed in parallel (otherwise we might experience a slowdown due to the overhead for
-		// workload distribution)
-		MsParallel(array, tmp, true, 0, size,floor(log2(omp_get_num_threads()+1))-1);
+		// At depth N (starting from 1), we have a total of 2^N-1 function calls.
+		// We will limit the amount of tasks created to the minimum value that guarantees that each threads executes a task
+		// Creating more tasks would not better the performance, and could actually decrease it due to the overhead in managing
+		// the task pool
+		MsParallel(array, tmp, true, 0, size,floor(log2(omp_get_num_threads()+1)));
 	}
 }
 
